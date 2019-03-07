@@ -24,7 +24,7 @@ func TestIsUrl(t *testing.T) {
 		"http:/invalid.com",
 		"http:invalid.com",
 	}
-	
+
 	for _, url := range invalidUrls {
 		if IsUrl(url) == true {
 			t.Errorf("%s should be invalid URL", url)

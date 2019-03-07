@@ -6,7 +6,7 @@ import (
 )
 
 type VideoPage struct {
-	url			string
+	url         string
 	playlistUrl string
 }
 
@@ -16,7 +16,7 @@ func GetVideoPage(url string) (VideoPage, error) {
 		return VideoPage{url: "", playlistUrl: ""}, err
 	}
 
-	vp := VideoPage {url, playlistUrl}
+	vp := VideoPage{url, playlistUrl}
 
 	return vp, nil
 }
@@ -41,10 +41,10 @@ func (vp VideoPage) GetStreamPlaylists() ([]StreamPlaylist, error) {
 
 			if isPlaylistInfo {
 				playlists = append(playlists, StreamPlaylist{
-					Name: extractLineInfo(line, "NAME=\"(\\d+p)"),
-					Bandwidth: extractLineInfo(line, "BANDWIDTH=(\\d+)"),
+					Name:       extractLineInfo(line, "NAME=\"(\\d+p)"),
+					Bandwidth:  extractLineInfo(line, "BANDWIDTH=(\\d+)"),
 					Resolution: extractLineInfo(line, "RESOLUTION=(\\d+x\\d+)"),
-					Url: "",
+					Url:        "",
 				})
 			}
 		} else {
@@ -64,7 +64,7 @@ func extractLineInfo(line string, regex string) string {
 		return match[1]
 	} else {
 		return ""
-	}	
+	}
 }
 
 func getPlaylistUrl(url string) (string, error) {

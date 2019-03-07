@@ -1,17 +1,17 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/signal"
-	"fmt"
-	"time"
-	"syscall"
 	s "strings"
+	"syscall"
+	"time"
 
-	"github.com/urfave/cli"
 	"github.com/manifoldco/promptui"
+	"github.com/urfave/cli"
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -40,7 +40,7 @@ func downloadCmd(cmd *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("Failed to fetch page information", 1)
 	}
-	
+
 	playlist, err := askResolution(page)
 	if err != nil {
 		return cli.NewExitError("Failed to fetch resolutions", 2)
@@ -52,7 +52,7 @@ func downloadCmd(cmd *cli.Context) error {
 		os.RemoveAll(tmpDir)
 		return cli.NewExitError("Something wrong while downloading file", 3)
 	}
-	
+
 	output := Concat(getFilename(url), " (", playlist.Name, ").mp4")
 	err = combineFiles(files, output)
 	if err != nil {
@@ -61,7 +61,7 @@ func downloadCmd(cmd *cli.Context) error {
 	}
 
 	fmt.Println("DONE")
-	
+
 	os.RemoveAll(tmpDir)
 	return nil
 }
@@ -100,15 +100,15 @@ func downloadStreamFiles(playlist StreamPlaylist, tmpDir string) ([]string, erro
 	}
 
 	files := make([]string, 0)
-	
+
 	// Remove downloaded files on Ctrl+C
 	c := make(chan os.Signal, 2)
-    signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-    go func() {
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
 		<-c
 		os.RemoveAll(tmpDir)
 		fmt.Println("aborted")
-        os.Exit(0)
+		os.Exit(0)
 	}()
 
 	// Start download files
@@ -133,14 +133,14 @@ func combineFiles(files []string, output string) error {
 		return err
 	}
 	defer out.Close()
-	
+
 	for _, file := range files {
 		in, err := os.Open(file)
 		if err != nil {
 			return err
 		}
 		defer in.Close()
-		
+
 		_, err = io.Copy(out, in)
 		if err != nil {
 			return err

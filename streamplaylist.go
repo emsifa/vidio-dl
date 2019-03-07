@@ -6,10 +6,10 @@ import (
 )
 
 type StreamPlaylist struct {
-	Name 		string
-	Resolution 	string
-	Bandwidth 	string
-	Url 		string
+	Name       string
+	Resolution string
+	Bandwidth  string
+	Url        string
 }
 
 func (sp StreamPlaylist) GetStreamUrls() ([]string, error) {
