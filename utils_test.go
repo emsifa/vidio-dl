@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"testing"
 )
 
@@ -45,5 +46,17 @@ func TestConcat(t *testing.T) {
 	b = "foobarbazqux"
 	if a != b {
 		t.Errorf("Concat(\"foo\", \"bar\", \"baz\", \"qux\") should be \"%s\", got \"%s\"", b, a)
+	}
+}
+
+func TestDownloadFile(t *testing.T) {
+	url := "https://jsonplaceholder.typicode.com/todos/1"
+	output := "sample.json"
+
+	DownloadFile(url, output, func(curr int64, total int64) {})
+	if _, err := os.Stat(output); os.IsNotExist(err) {
+		t.Fatalf("File %s is not downloaded", output)
+	} else {
+		os.Remove(output)
 	}
 }

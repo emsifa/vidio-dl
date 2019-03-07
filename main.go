@@ -46,6 +46,15 @@ func downloadCmd(cmd *cli.Context) error {
 		return cli.NewExitError("Failed to fetch resolutions", 2)
 	}
 
+	output := Concat(getFilename(url), " (", playlist.Name, ").mp4")
+	replace := false
+	if _, err := os.Stat(output); err == nil {
+		replace = askReplace(output)
+		if !replace {
+			os.Exit(0)
+		}
+	}
+
 	tmpDir := makeTempDir()
 	files, err := downloadStreamFiles(playlist, tmpDir)
 	if err != nil {
@@ -53,17 +62,42 @@ func downloadCmd(cmd *cli.Context) error {
 		return cli.NewExitError("Something wrong while downloading file", 3)
 	}
 
-	output := Concat(getFilename(url), " (", playlist.Name, ").mp4")
+	if replace {
+		os.Remove(output)
+	}
+
 	err = combineFiles(files, output)
 	if err != nil {
 		os.RemoveAll(tmpDir)
 		return cli.NewExitError("Failed to combine files", 4)
 	}
 
-	fmt.Println("DONE")
+	fmt.Printf("Saved: %s", output)
 
 	os.RemoveAll(tmpDir)
 	return nil
+}
+
+func askReplace(output string) bool {
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U000027A4 {{ . | cyan }}",
+		Inactive: "  {{ . }}",
+		Selected: "\U000027A4 {{ . | blue | cyan }}",
+	}
+
+	prompt := promptui.Select{
+		Label:     fmt.Sprintf("File %s already exists. Do you want to replace it", output),
+		Items:     []string{"Yes", "No"},
+		Templates: templates,
+	}
+
+	i, _, err := prompt.Run()
+	if err != nil {
+		return false
+	}
+
+	return i == 0
 }
 
 func askResolution(page VideoPage) (StreamPlaylist, error) {
